@@ -350,19 +350,19 @@
 @property (nonatomic , weak) ConfigurableNaviController *proxy;
 @property (nonatomic, strong) UIPercentDrivenInteractiveTransition *popDrivenInteractiveTransition;
 @property (nonatomic, strong) UIScreenEdgePanGestureRecognizer *popGestureRecognizer;
+@property (nonatomic, strong) ConfigurableNaviBarAppearanceBlock appearanceBlock;
 
 @end
 
 
 @implementation ConfigurableNaviController
 
-#pragma mark - Overwrite methods
-
-- (instancetype)initWithRootViewController:(UIViewController *)rootViewController
+- (instancetype)initWithRootViewController:(UIViewController *)rootViewController defaultNavigationBarAppearance:(ConfigurableNaviBarAppearanceBlock)block
 {
     self = [super init];
     if (self)
     {
+        self.appearanceBlock = block;
         self.viewControllers = @[ [self wrapControllerWithViewController:rootViewController] ];
         self.delegate = self;
         self.navigationBarHidden = YES;
@@ -371,6 +371,13 @@
     }
     
     return self;
+}
+
+#pragma mark - Overwrite methods
+
+- (instancetype)initWithRootViewController:(UIViewController *)rootViewController
+{
+    return [self initWithRootViewController:rootViewController defaultNavigationBarAppearance:nil];
 }
 
 - (void)viewDidLoad
@@ -636,6 +643,12 @@
     ConfigurableNaviController * navigationController = [navigationControllerClass new];
     navigationController.proxy = self;
     navigationController.viewControllers = @[viewControlller];
+    
+    if (self.appearanceBlock)
+    {
+        // Set default appearance.
+        self.appearanceBlock(navigationController.navigationBar);
+    }
     
     [wrapViewController.view addSubview:navigationController.view];
     [wrapViewController addChildViewController:navigationController];

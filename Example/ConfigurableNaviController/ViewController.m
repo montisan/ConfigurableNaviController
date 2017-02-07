@@ -60,7 +60,12 @@
     UIBarButtonItem * leftItem = [[UIBarButtonItem alloc] initWithTitle:@"Exit" style:(UIBarButtonItemStylePlain) target:self action:@selector(onLeftBarItemClick:)];
     pushController.navigationItem.leftBarButtonItem = leftItem;
     
-    ConfigurableNaviController *rootNav = [[ConfigurableNaviController alloc] initWithRootViewController:pushController];
+    ConfigurableNaviController *rootNav = [[ConfigurableNaviController alloc] initWithRootViewController:pushController defaultNavigationBarAppearance:^(UINavigationBar *navigationBar) {
+        
+        navigationBar.barTintColor = [UIColor greenColor];
+        navigationBar.tintColor = [UIColor blueColor];
+        
+    }];
     rootNav.transAnimStyle = [sender tag] - 100;
     
     

@@ -26,11 +26,17 @@ typedef NS_ENUM(NSUInteger, ConfigurableTransAnimStyle)
 
 @end
 
+typedef void(^ConfigurableNaviBarAppearanceBlock)(UINavigationBar *navigationBar);
 @interface ConfigurableNaviController : UINavigationController
 // Don't set `delegate`, use `proxyDelegate` instead.
 @property (nonatomic, weak) id<ConfigurableNavigationControllerDelegate> proxyDelegate;
 // Set the transitioning animation style, `ConfigurableTransAnimStyle1` is default style.
 @property (nonatomic, assign) ConfigurableTransAnimStyle transAnimStyle;
+
+// Init and set the block to config default appearance of navigation bar for every view controller.
+// If config different appearance, just do it in `viewDidLoad` method of the view controller.
+- (instancetype)initWithRootViewController:(UIViewController *)rootViewController defaultNavigationBarAppearance:(ConfigurableNaviBarAppearanceBlock)block;
+
 @end
 
 @interface UIViewController(ConfigurableNaviController)
