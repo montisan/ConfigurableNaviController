@@ -226,6 +226,7 @@
 				TargetAttributes = {
 					D5585B2B1E4950A60070C6F1 = {
 						CreatedOnToolsVersion = 8.2;
+						DevelopmentTeam = 58YB535G5V;
 						ProvisioningStyle = Automatic;
 					};
 					D5585B441E4950A60070C6F1 = {
@@ -445,6 +446,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 58YB535G5V;
 				INFOPLIST_FILE = ConfigurableNaviController/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = hncoder.ConfigurableNaviController;
@@ -456,6 +458,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 58YB535G5V;
 				INFOPLIST_FILE = ConfigurableNaviController/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = hncoder.ConfigurableNaviController;
