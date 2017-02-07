@@ -739,6 +739,22 @@
     return transitioning;
 }
 
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if ([self.proxyDelegate respondsToSelector:@selector(navigationController:willShowViewController:animated:)])
+    {
+        [self.proxyDelegate navigationController:navigationController willShowViewController:[self entityControllerWithViewController:(ConfigurableWrapViewController *)viewController] animated:animated];
+    }
+}
+
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if ([self.proxyDelegate respondsToSelector:@selector(navigationController:didShowViewController:animated:)])
+    {
+        [self.proxyDelegate navigationController:navigationController didShowViewController:[self entityControllerWithViewController:(ConfigurableWrapViewController *)viewController] animated:animated];
+    }
+}
+
 @end
 
 @implementation UIViewController(ConfigurableNaviController)
