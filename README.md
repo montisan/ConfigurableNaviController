@@ -29,5 +29,5 @@ ConfigurableNaviController is available under the MIT license. See the LICENSE f
 A navigation controller with configurable transitioning animation and navigation bar appearance. The references are [QLXNavigationController](https://github.com/QiuLiangXiong/QLXNavigationController.git) and [DZXNavigationController](https://github.com/devzahi/DZXNavigationController.git).
 
 ## Demo Screen
-<iframe height=569 width=320 src="https://github.com/hncoder/ConfigurableNaviController/blob/master/ConfigurableNaviController.gif">
+![Demo Screen](https://raw.githubusercontent.com/hncoder/ConfigurableNaviController/master/ConfigurableNaviController.gif)
 
