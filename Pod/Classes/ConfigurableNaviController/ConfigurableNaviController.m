@@ -118,7 +118,7 @@
     
     Class class = NSClassFromString(@"UINavigationItemView");
     [navigationBar.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([obj isKindOfClass:class])
+        if ([obj isKindOfClass:[class class]])
         {
             titleView = obj;
             *stop = nil;
