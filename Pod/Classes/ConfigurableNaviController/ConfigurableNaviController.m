@@ -121,7 +121,7 @@
         if ([obj isKindOfClass:[class class]])
         {
             titleView = obj;
-            *stop = nil;
+            *stop = YES;
         }
     }];
     
