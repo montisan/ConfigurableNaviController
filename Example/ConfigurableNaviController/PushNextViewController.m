@@ -20,7 +20,7 @@
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
     [[btn titleLabel] setFont:[UIFont systemFontOfSize:13]];
-    [btn setTitle:@"PushNext" forState:UIControlStateNormal];
+    [btn setTitle:@"Push Next" forState:UIControlStateNormal];
     [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(clicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn];
@@ -61,6 +61,7 @@
 - (void)clicked:(id)sender
 {
     PushNextViewController *nextController = [[PushNextViewController alloc] init];
+    nextController.hidesBottomBarWhenPushed = YES;
     
     [self.navigationController pushViewController:nextController animated:YES];
 }

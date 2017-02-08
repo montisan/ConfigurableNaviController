@@ -23,17 +23,17 @@
 {
     return [self entity].hidesBottomBarWhenPushed;
 }
-
-- (UITabBarItem *)tabBarItem
-{
-    return [self entity].tabBarItem;
-}
-
-- (NSString *)title
-{
-    return [self entity].title;
-}
-
+//
+//- (UITabBarItem *)tabBarItem
+//{
+//    return [self entity].tabBarItem;
+//}
+//
+//- (NSString *)title
+//{
+//    return [self entity].title;
+//}
+//
 - (UIViewController *)childViewControllerForStatusBarStyle
 {
     return [self entity];
@@ -67,6 +67,7 @@
 - (void)setNavigationBarOriginXWithController:(UIViewController *)controller originX:(CGFloat)x;
 - (void)setNavigationBarItemsAlphaWithController:(UIViewController *)controller alpha:(CGFloat)alpha;
 - (UIViewController *)entityControllerWithWrapController:(UIViewController *)wrapController;
+- (void)replaceTabBarXWithController:(UIViewController *)controller;
 @end
 
 @implementation ConfigurableTransitionAnimation
@@ -123,6 +124,17 @@
     }
     
     return wrapController;
+}
+
+- (void)replaceTabBarXWithController:(UIViewController *)controller
+{
+    if (!controller.hidesBottomBarWhenPushed
+        && controller.tabBarController)
+    {
+        CGRect frame = controller.tabBarController.tabBar.frame;
+        frame.origin.x = 0;
+        controller.tabBarController.tabBar.frame = frame;
+    }
 }
 
 @end
@@ -190,6 +202,7 @@
          [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:-kScreenWidth];
          [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:0.0];
          [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:1.0];
+         [self replaceTabBarXWithController:toViewController];
      }
      completion:^(BOOL finished)
      {
@@ -244,8 +257,9 @@
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^
      {
          fromViewController.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
+         [self replaceTabBarXWithController:toViewController];
      }
-                     completion:^(BOOL finished)
+     completion:^(BOOL finished)
      {
          [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
      }];
@@ -334,6 +348,7 @@
         self.shadowView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0];
         fromViewController.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
         toViewController.view.transform = CGAffineTransformMakeScale(1.0, 1.0);
+        [self replaceTabBarXWithController:toViewController];
     }
     completion:^(BOOL finished)
     {

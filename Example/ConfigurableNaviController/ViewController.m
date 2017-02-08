@@ -20,45 +20,19 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    UIButton *btn1 = [UIButton buttonWithType:UIButtonTypeCustom];
-    [[btn1 titleLabel] setFont:[UIFont systemFontOfSize:13]];
-    [btn1 setTitle:@"PushTransAnimStyle1" forState:UIControlStateNormal];
-    [btn1 setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-    [btn1 addTarget:self action:@selector(clicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:btn1];
-    [btn1 setTag:100];
-    [btn1 sizeToFit];
-    btn1.center = CGPointMake(self.view.frame.size.width/2.0, self.view.frame.size.height/2.0 - btn1.bounds.size.height - 10);
-    
-    UIButton *btn2 = [UIButton buttonWithType:UIButtonTypeCustom];
-    [[btn2 titleLabel] setFont:[UIFont systemFontOfSize:13]];
-    [btn2 setTitle:@"PushTransAnimStyle2" forState:UIControlStateNormal];
-    [btn2 setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-    [btn2 addTarget:self action:@selector(clicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:btn2];
-    [btn2 setTag:101];
-    [btn2 sizeToFit];
-    btn2.center = CGPointMake(self.view.frame.size.width/2.0, self.view.frame.size.height/2.0);
-    
-    UIButton *btn3 = [UIButton buttonWithType:UIButtonTypeCustom];
-    [[btn3 titleLabel] setFont:[UIFont systemFontOfSize:13]];
-    [btn3 setTitle:@"PushTransAnimStyle3" forState:UIControlStateNormal];
-    [btn3 setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
-    [btn3 addTarget:self action:@selector(clicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:btn3];
-    [btn3 setTag:102];
-    [btn3 sizeToFit];
-    
-    btn3.center = CGPointMake(self.view.frame.size.width/2.0, self.view.frame.size.height/2.0 + btn2.bounds.size.height + 10);
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [[btn titleLabel] setFont:[UIFont systemFontOfSize:13]];
+    [btn setTitle:@"PushTransAnimStylesDemo" forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(clicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:btn];
+    [btn sizeToFit];
+    btn.center = CGPointMake(self.view.frame.size.width/2.0, self.view.frame.size.height/2.0);
 }
 
-
-- (void)clicked:(id)sender
+- (UINavigationController *)navigationControllerWithTitle:(NSString *)title pushAnimStyle:(ConfigurableTransAnimStyle)style
 {
     PushNextViewController *pushController = [[PushNextViewController alloc] init];
-    
-    UIBarButtonItem * leftItem = [[UIBarButtonItem alloc] initWithTitle:@"Exit" style:(UIBarButtonItemStylePlain) target:self action:@selector(onLeftBarItemClick:)];
-    pushController.navigationItem.leftBarButtonItem = leftItem;
     
     ConfigurableNaviController *rootNav = [[ConfigurableNaviController alloc] initWithRootViewController:pushController defaultNavigationBarAppearance:^(UINavigationBar *navigationBar) {
         
@@ -66,10 +40,25 @@
         navigationBar.tintColor = [UIColor blueColor];
         
     }];
-    rootNav.transAnimStyle = [sender tag] - 100;
+    rootNav.transAnimStyle = style;
+    
+    rootNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:title image:nil selectedImage:nil];
     
     
-    [self presentViewController:rootNav animated:YES completion:^{
+    return rootNav;
+}
+
+- (void)clicked:(id)sender
+{
+
+    UINavigationController *pushAnim1Navi = [self navigationControllerWithTitle:@"PushTransAnimStyle1" pushAnimStyle:ConfigurableTransAnimStyle1];
+    UINavigationController *pushAnim2Navi = [self navigationControllerWithTitle:@"PushTransAnimStyle2" pushAnimStyle:ConfigurableTransAnimStyle2];
+    UINavigationController *pushAnim3Navi = [self navigationControllerWithTitle:@"PushTransAnimStyle3" pushAnimStyle:ConfigurableTransAnimStyle3];
+    
+    UITabBarController *barController = [[UITabBarController alloc] init];
+    barController.viewControllers = @[pushAnim1Navi,pushAnim2Navi,pushAnim3Navi];
+    
+    [self presentViewController:barController animated:YES completion:^{
         
     }];
 }
