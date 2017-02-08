@@ -8,12 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-// It supports three transitioning animation style
+// It supports four transitioning animation style
 typedef NS_ENUM(NSUInteger, ConfigurableTransAnimStyle)
 {
     ConfigurableTransAnimStyle1,
     ConfigurableTransAnimStyle2,
     ConfigurableTransAnimStyle3,
+    ConfigurableTransAnimStyle4,
     ConfigurableTransAnimStyleDefault = ConfigurableTransAnimStyle1,
 };
 

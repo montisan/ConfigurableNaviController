@@ -57,6 +57,8 @@
 #define kAnimationDuration (0.25)
 #define kScreenWidth [UIScreen mainScreen].bounds.size.width
 #define kScreenHeight [UIScreen mainScreen].bounds.size.height
+#define kAnimScreenOffset (kScreenWidth/2.0)
+#define kAnimTitleScreenOffset (kScreenWidth/4.0)
 
 @interface ConfigurableTransitionAnimation : NSObject<UIViewControllerAnimatedTransitioning>
 - (void)setupTransitioningAnimationFrom:(UIViewController *)fromViewController
@@ -65,9 +67,11 @@
                                 context:(id<UIViewControllerContextTransitioning>)transitionContext;
 - (void)setShadowWithController:(UIViewController *)controller;
 - (void)setNavigationBarOriginXWithController:(UIViewController *)controller originX:(CGFloat)x;
+- (void)setNavigationBarTitleCenterXWithController:(UIViewController *)controller centerX:(CGFloat)x;
 - (void)setNavigationBarItemsAlphaWithController:(UIViewController *)controller alpha:(CGFloat)alpha;
 - (UIViewController *)entityControllerWithWrapController:(UIViewController *)wrapController;
 - (void)replaceTabBarXWithController:(UIViewController *)controller;
+- (BOOL)canConfigNavTransAnimWithFromController:(UIViewController *)from toController:(UIViewController *)to;
 @end
 
 @implementation ConfigurableTransitionAnimation
@@ -108,6 +112,33 @@
     controller.navigationController.navigationBar.frame = frame;
 }
 
+- (UIView *)titleViewWithNavigationBar:(UINavigationBar *)navigationBar
+{
+    __block UIView *titleView = nil;
+    
+    Class class = NSClassFromString(@"UINavigationItemView");
+    [navigationBar.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isKindOfClass:class])
+        {
+            titleView = obj;
+            *stop = nil;
+        }
+    }];
+    
+    return titleView;
+}
+
+- (void)setNavigationBarTitleCenterXWithController:(UIViewController *)controller centerX:(CGFloat)x
+{
+    UIView *titleView = [self titleViewWithNavigationBar:controller.navigationController.navigationBar];
+    if (titleView)
+    {
+        CGPoint center = titleView.center;
+        center.x = x;
+        titleView.center = center;
+    }
+}
+
 - (void)setNavigationBarItemsAlphaWithController:(UIViewController *)controller alpha:(CGFloat)alpha
 {
     controller.navigationItem.leftBarButtonItem.customView.alpha = alpha;
@@ -137,6 +168,11 @@
     }
 }
 
+- (BOOL)canConfigNavTransAnimWithFromController:(UIViewController *)from toController:(UIViewController *)to
+{
+    return (!from.navigationController.isNavigationBarHidden
+            && !to.navigationController.isNavigationBarHidden);
+}
 @end
 
 @interface ConfigurablePushTransitionAnimation1 : ConfigurableTransitionAnimation
@@ -155,18 +191,27 @@
     toViewController.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
     [self setShadowWithController:toViewController];
     
-    [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:-kScreenWidth];
-    [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:0.0];
-    [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:1.0];
-    
+    BOOL canConfigNavTransAnim = [self canConfigNavTransAnimWithFromController:[self entityControllerWithWrapController:fromViewController] toController:[self entityControllerWithWrapController:toViewController]];
+    if (canConfigNavTransAnim)
+    {
+        [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:-kScreenWidth];
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:0.0];
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:1.0];
+    }
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^
     {
-         toViewController.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
-         [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:0];
-         [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:1.0];
-         [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:0.0];
-         
+        toViewController.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
+        fromViewController.view.frame = CGRectMake(-kAnimScreenOffset, 0, kScreenWidth, kScreenHeight);
+        
+        if (canConfigNavTransAnim)
+        {
+            [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:1.0];
+            [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:0.0];
+            
+            [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:0];
+            [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:kAnimScreenOffset];
+        }
     }
     completion:^(BOOL finished)
     {
@@ -191,17 +236,30 @@
     
     [self setShadowWithController:fromViewController];
     
-    [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:0];
-    [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:1.0];
-    [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:0.0];
+    BOOL canConfigNavTransAnim = [self canConfigNavTransAnimWithFromController:[self entityControllerWithWrapController:fromViewController] toController:[self entityControllerWithWrapController:toViewController]];
+    if (canConfigNavTransAnim)
+    {
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:1.0];
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:0.0];
+        
+        [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:0];
+        [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:kAnimScreenOffset];
     
+    }
     
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^
      {
          fromViewController.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
-         [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:-kScreenWidth];
-         [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:0.0];
-         [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:1.0];
+         toViewController.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
+         if (canConfigNavTransAnim)
+         {
+             [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:0.0];
+             [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:1.0];
+             
+             [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:-kScreenWidth];
+             [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:0];
+         }
+         
          [self replaceTabBarXWithController:toViewController];
      }
      completion:^(BOOL finished)
@@ -216,6 +274,113 @@
 @end
 
 @implementation ConfigurablePushTransitionAnimation2
+
+- (void)setupTransitioningAnimationFrom:(UIViewController *)fromViewController
+                                     to:(UIViewController *)toViewController
+                              container:(UIView *)containerView
+                                context:(id<UIViewControllerContextTransitioning>)transitionContext
+{
+    [containerView insertSubview:toViewController.view
+                    aboveSubview:fromViewController.view];
+    
+    toViewController.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
+    [self setShadowWithController:toViewController];
+    
+    BOOL canConfigNavTransAnim = [self canConfigNavTransAnimWithFromController:[self entityControllerWithWrapController:fromViewController] toController:[self entityControllerWithWrapController:toViewController]];
+    if (canConfigNavTransAnim)
+    {
+        [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:-kScreenWidth];
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:0.0];
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:1.0];
+        
+        [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:fromViewController] centerX:kScreenWidth/2.0];
+        [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:toViewController] centerX:kScreenWidth/2.0+kAnimTitleScreenOffset];
+    }
+    
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^
+     {
+         toViewController.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
+         fromViewController.view.frame = CGRectMake(-kAnimScreenOffset, 0, kScreenWidth, kScreenHeight);
+         
+         if (canConfigNavTransAnim)
+         {
+             [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:1.0];
+             [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:0.0];
+             
+             [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:0];
+             [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:kAnimScreenOffset];
+             
+             [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:fromViewController] centerX:kScreenWidth/2.0-kAnimTitleScreenOffset];
+             [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:toViewController] centerX:kScreenWidth/2.0];
+         }
+     }
+                     completion:^(BOOL finished)
+     {
+         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+     }];
+}
+
+@end
+
+@interface ConfigurablePopTransitionAnimation2 : ConfigurableTransitionAnimation
+@end
+
+@implementation ConfigurablePopTransitionAnimation2
+
+- (void)setupTransitioningAnimationFrom:(UIViewController *)fromViewController
+                                     to:(UIViewController *)toViewController
+                              container:(UIView *)containerView
+                                context:(id<UIViewControllerContextTransitioning>)transitionContext
+{
+    [containerView insertSubview:toViewController.view
+                    belowSubview:fromViewController.view];
+    
+    [self setShadowWithController:fromViewController];
+    
+    BOOL canConfigNavTransAnim = [self canConfigNavTransAnimWithFromController:[self entityControllerWithWrapController:fromViewController] toController:[self entityControllerWithWrapController:toViewController]];
+    if (canConfigNavTransAnim)
+    {
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:1.0];
+        [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:0.0];
+        
+        [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:0];
+        [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:kAnimScreenOffset];
+        
+        [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:fromViewController] centerX:kScreenWidth/2.0];
+        [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:toViewController] centerX:kScreenWidth/2.0-kAnimTitleScreenOffset];
+        
+    }
+    
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^
+     {
+         fromViewController.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
+         toViewController.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
+         if (canConfigNavTransAnim)
+         {
+             [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:fromViewController] alpha:0.0];
+             [self setNavigationBarItemsAlphaWithController:[self entityControllerWithWrapController:toViewController] alpha:1.0];
+             
+             [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:fromViewController] originX:-kScreenWidth];
+             [self setNavigationBarOriginXWithController:[self entityControllerWithWrapController:toViewController] originX:0];
+             
+             [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:fromViewController] centerX:kScreenWidth/2.0+kAnimTitleScreenOffset];
+             [self setNavigationBarTitleCenterXWithController:[self entityControllerWithWrapController:toViewController] centerX:kScreenWidth/2.0];
+         }
+         
+         [self replaceTabBarXWithController:toViewController];
+     }
+                     completion:^(BOOL finished)
+     {
+         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+     }];
+}
+
+@end
+
+@interface ConfigurablePushTransitionAnimation3 : ConfigurableTransitionAnimation
+@end
+
+@implementation ConfigurablePushTransitionAnimation3
 - (void)setupTransitioningAnimationFrom:(UIViewController *)fromViewController
                                      to:(UIViewController *)toViewController
                               container:(UIView *)containerView
@@ -239,10 +404,10 @@
 
 @end
 
-@interface ConfigurablePopTransitionAnimation2 : ConfigurableTransitionAnimation
+@interface ConfigurablePopTransitionAnimation3 : ConfigurableTransitionAnimation
 @end
 
-@implementation ConfigurablePopTransitionAnimation2
+@implementation ConfigurablePopTransitionAnimation3
 
 - (void)setupTransitioningAnimationFrom:(UIViewController *)fromViewController
                                      to:(UIViewController *)toViewController
@@ -267,11 +432,11 @@
 
 @end
 
-@interface ConfigurablePushTransitionAnimation3 : ConfigurableTransitionAnimation
+@interface ConfigurablePushTransitionAnimation4 : ConfigurableTransitionAnimation
 @property (nonatomic, strong) UIView *shadowView;
 @end
 
-@implementation ConfigurablePushTransitionAnimation3
+@implementation ConfigurablePushTransitionAnimation4
 
 - (UIView *)shadowView
 {
@@ -312,11 +477,11 @@
 
 @end
 
-@interface ConfigurablePopTransitionAnimation3 : ConfigurableTransitionAnimation
+@interface ConfigurablePopTransitionAnimation4 : ConfigurableTransitionAnimation
 @property (nonatomic, strong) UIView *shadowView;
 @end
 
-@implementation ConfigurablePopTransitionAnimation3
+@implementation ConfigurablePopTransitionAnimation4
 
 - (UIView *)shadowView
 {
@@ -709,6 +874,10 @@
             transitionAnimation = [ConfigurablePushTransitionAnimation3 new];
             break;
             
+        case ConfigurableTransAnimStyle4:
+            transitionAnimation = [ConfigurablePushTransitionAnimation4 new];
+            break;
+            
         default:
             break;
     }
@@ -733,6 +902,10 @@
             transitionAnimation = [ConfigurablePopTransitionAnimation3 new];
             break;
             
+        case ConfigurableTransAnimStyle4:
+            transitionAnimation = [ConfigurablePopTransitionAnimation4 new];
+            break;
+            
         default:
             break;
     }
@@ -746,7 +919,8 @@
 {
     return [animationController isKindOfClass:[ConfigurablePopTransitionAnimation1 class]]
         || [animationController isKindOfClass:[ConfigurablePopTransitionAnimation2 class]]
-        || [animationController isKindOfClass:[ConfigurablePopTransitionAnimation3 class]] ? self.popDrivenInteractiveTransition : nil;
+        || [animationController isKindOfClass:[ConfigurablePopTransitionAnimation3 class]]
+        || [animationController isKindOfClass:[ConfigurablePopTransitionAnimation4 class]]? self.popDrivenInteractiveTransition : nil;
 }
 
 - (id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController

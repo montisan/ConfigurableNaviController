@@ -54,9 +54,10 @@
     UINavigationController *pushAnim1Navi = [self navigationControllerWithTitle:@"PushTransAnimStyle1" pushAnimStyle:ConfigurableTransAnimStyle1];
     UINavigationController *pushAnim2Navi = [self navigationControllerWithTitle:@"PushTransAnimStyle2" pushAnimStyle:ConfigurableTransAnimStyle2];
     UINavigationController *pushAnim3Navi = [self navigationControllerWithTitle:@"PushTransAnimStyle3" pushAnimStyle:ConfigurableTransAnimStyle3];
+    UINavigationController *pushAnim4Navi = [self navigationControllerWithTitle:@"PushTransAnimStyle4" pushAnimStyle:ConfigurableTransAnimStyle4];
     
     UITabBarController *barController = [[UITabBarController alloc] init];
-    barController.viewControllers = @[pushAnim1Navi,pushAnim2Navi,pushAnim3Navi];
+    barController.viewControllers = @[pushAnim1Navi,pushAnim2Navi,pushAnim3Navi,pushAnim4Navi];
     
     [self presentViewController:barController animated:YES completion:^{
         
