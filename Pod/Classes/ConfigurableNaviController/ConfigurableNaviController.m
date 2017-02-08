@@ -395,6 +395,7 @@
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^
     {
         toViewController.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
+        fromViewController.view.frame = CGRectMake(-kAnimScreenOffset, 0, kScreenWidth, kScreenHeight);
     }
     completion:^(BOOL finished)
     {
@@ -422,6 +423,7 @@
     [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^
      {
          fromViewController.view.frame = CGRectMake(kScreenWidth, 0, kScreenWidth, kScreenHeight);
+         toViewController.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight);
          [self replaceTabBarXWithController:toViewController];
      }
      completion:^(BOOL finished)
